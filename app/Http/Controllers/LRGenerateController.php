@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\LR_Generate;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LRGenerateController extends Controller
 {
@@ -16,14 +18,14 @@ class LRGenerateController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'invoice_no' => 'required|integer',
                 'value_rs' => 'required|integer',
-                'lorry_no' => 'required|integer',
-                'cnn_no' => 'required|integer',
+                'lorry_no' => 'required|string|max:30',
                 'delivery_at' => 'required|string|max:30',
                 'date' => 'required|date',
+                'consignor' => 'required|string|max:30',
                 'consignor_gstin_no' => 'required|string|max:30',
                 'consignor_eway_bill_no' => 'required|string|max:30',
+                'consignee' => 'required|string|max:30',
                 'consignee_gstin_no' => 'required|string|max:30',
                 'consignee_eway_bill_no' => 'required|string|max:30',
                 'from' => 'required|string|max:30',
@@ -36,6 +38,7 @@ class LRGenerateController extends Controller
                 'destination' => 'required|string|max:30',
                 'actual_weight' => 'required|numeric',
                 'rate_per_mt' => 'required|numeric',
+                'remarks' => 'required|string|max:30',
                 'bc' => 'required|numeric',
                 'sgst' => 'required|numeric',
                 'cgst' => 'required|numeric',
@@ -43,22 +46,22 @@ class LRGenerateController extends Controller
                 'gc' => 'required|numeric',
                 'grand_total' => 'required|numeric',
             ], [
-                'invoice_no.required' => 'Invoice number is required.',
-                'invoice_no.integer' => 'Invoice number must be a valid integer.',
                 'value_rs.required' => 'Value is required.',
                 'value_rs.integer' => 'Value must be a valid integer.',
                 'lorry_no.required' => 'Lorry number is required.',
                 'lorry_no.integer' => 'Lorry number must be a valid integer.',
-                'cnn_no.required' => 'CNN number is required.',
-                'cnn_no.integer' => 'CNN number must be a valid integer.',
                 'delivery_at.required' => 'Delivery location is required.',
                 'delivery_at.max' => 'Delivery location must not exceed 30 characters.',
                 'date.required' => 'Date is required.',
                 'date.date' => 'Date must be a valid date format.',
+                'consignor.required' => 'Consignor name is required.',
+                'consignor.max' => 'Consignor name must not exceed 30 characters.',
                 'consignor_gstin_no.required' => 'Consignor GSTIN number is required.',
                 'consignor_gstin_no.max' => 'Consignor GSTIN number must not exceed 30 characters.',
                 'consignor_eway_bill_no.required' => 'Consignor E-way bill number is required.',
                 'consignor_eway_bill_no.max' => 'Consignor E-way bill number must not exceed 30 characters.',
+                'consignee.required' => 'Consignee name is required.',
+                'consignee.max' => 'Consignee name must not exceed 30 characters.',
                 'consignee_gstin_no.required' => 'Consignee GSTIN number is required.',
                 'consignee_gstin_no.max' => 'Consignee GSTIN number must not exceed 30 characters.',
                 'consignee_eway_bill_no.required' => 'Consignee E-way bill number is required.',
@@ -83,6 +86,8 @@ class LRGenerateController extends Controller
                 'actual_weight.numeric' => 'Actual weight must be a valid number.',
                 'rate_per_mt.required' => 'Rate per MT is required.',
                 'rate_per_mt.numeric' => 'Rate per MT must be a valid number.',
+                'remarks.required' => 'Remarks are required.',
+                'remarks.max' => 'Remarks must not exceed 30 characters.',
                 'bc.required' => 'BC is required.',
                 'bc.numeric' => 'BC must be a valid number.',
                 'sgst.required' => 'SGST is required.',
@@ -97,6 +102,25 @@ class LRGenerateController extends Controller
                 'grand_total.numeric' => 'Grand total must be a valid number.',
             ]);
 
+            $validatedData['date'] = \Carbon\Carbon::parse($validatedData['date'])->setTimeFromTimeString(now()->format('H:i:s'));
+
+            $latestLR = LR_Generate::orderBy('lr_generate_no', 'desc')->first();
+            // Generate next invoice_no
+            if ($latestLR && preg_match('/^DKI(\d+)$/', $latestLR->invoice_no, $matches)) {
+                $nextInvoiceNumber = intval($matches[1]) + 1;
+                $validatedData['invoice_no'] = 'DKI' . str_pad($nextInvoiceNumber, 4, '0', STR_PAD_LEFT);
+            } else {
+                $validatedData['invoice_no'] = 'DKI0001';
+            }
+
+            // Generate next cnn_no
+            if ($latestLR && preg_match('/^DKC(\d+)$/', $latestLR->cnn_no, $matches)) {
+                $nextCNNNumber = intval($matches[1]) + 1;
+                $validatedData['cnn_no'] = 'DKC' . str_pad($nextCNNNumber, 3, '0', STR_PAD_LEFT);
+            } else {
+                $validatedData['cnn_no'] = 'DKC001';
+            }
+
             $lrGenerate = LR_Generate::create($validatedData);
 
             return response()->json([
@@ -107,7 +131,43 @@ class LRGenerateController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['status' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['status' => false, 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function getNextNumbers()
+    {
+        $latestLR = LR_Generate::orderBy('lr_generate_no', 'desc')->first();
+
+        // Generate next invoice_no
+        if ($latestLR && preg_match('/^DKI(\d+)$/', $latestLR->invoice_no, $matches)) {
+            $nextInvoiceNumber = intval($matches[1]) + 1;
+            $invoice_no = 'DKI' . str_pad($nextInvoiceNumber, 4, '0', STR_PAD_LEFT);
+        } else {
+            $invoice_no = 'DKI0001';
+        }
+
+        // Generate next cnn_no
+        if ($latestLR && preg_match('/^DKC(\d+)$/', $latestLR->cnn_no, $matches)) {
+            $nextCNNNumber = intval($matches[1]) + 1;
+            $cnn_no = 'DKC' . str_pad($nextCNNNumber, 3, '0', STR_PAD_LEFT);
+        } else {
+            $cnn_no = 'DKC001';
+        }
+
+        return response()->json([
+            'invoice_no' => $invoice_no,
+            'cnn_no' => $cnn_no
+        ]);
+    }
+
+    public function downloadPDF($invoice_no)
+    {
+        $data = LR_Generate::where('invoice_no', $invoice_no)->first();
+        if (!$data) {
+            return response()->json(['error' => 'Invoice not found'], 404);
+        }
+        $pdf = Pdf::loadView('pdf', ['data' => $data]);
+        return $pdf->download("LR_{$invoice_no}.pdf");
     }
 }

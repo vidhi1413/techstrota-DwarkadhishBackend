@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('l_r__generates', function (Blueprint $table) {
             $table->increments('lr_generate_no');
-            $table->integer('invoice_no');
+            $table->string('invoice_no',10);
             $table->integer('value_rs');
-            $table->integer('lorry_no');
-            $table->integer('cnn_no');
+            $table->string('lorry_no');
+            $table->string('cnn_no',10);
             $table->string('delivery_at', 30);
             $table->datetime('date');
-            $table->integer('consignor_gstin_no');
-            $table->integer('consignor_eway_bill_no');
-            $table->integer('consignee_gstin_no');
-            $table->integer('consignee_eway_bill_no');
+            $table->string('consignor',30);
+            $table->string('consignor_gstin_no', 30);
+            $table->string('consignor_eway_bill_no', 30);
+            $table->string('consignee', 30);
+            $table->string('consignee_gstin_no', 30);
+            $table->string('consignee_eway_bill_no', 30);
             $table->string('from', 30);
             $table->string('to', 30);
             $table->string('insurance_company_name', 20);
@@ -33,6 +35,7 @@ return new class extends Migration
             $table->string('destination', 30);
             $table->double('actual_weight', 8, 2);
             $table->double('rate_per_mt', 8, 2);
+            $table->string('remarks', 30);
             $table->double('bc', 8, 2);
             $table->double('sgst', 8, 2);
             $table->double('cgst', 8, 2);
