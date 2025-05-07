@@ -12,10 +12,16 @@ class Invoices extends Model
     protected $table = 'invoices';
 
     protected $fillable = [
-        'lr_number',
-        'truck_number',
+        'bill_to',
+        'address',
+        'gst_no',
+        'branch',
+        'invoice_no',
+        'date',
+        'lr_no',
+        'truck_no',
         'from_to',
-        'material_details',
+        'material_parcel',
         'total_weight',
         'freight_amount',
         'halting_charge',
@@ -26,6 +32,7 @@ class Invoices extends Model
         'remarks',
         'sub_total',
         'discount',
+        'total_trip_amount',
         'invoice_value',
         'advance_received',
         'net_payable',

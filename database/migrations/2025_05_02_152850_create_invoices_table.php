@@ -13,10 +13,16 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->string('lr_number', 30);
-            $table->string('truck_number', 20);
+            $table->string('bill_to', 30);
+            $table->string('address', 50);
+            $table->string('gst_no', 15);
+            $table->integer('branch');
+            $table->string('invoice_no', 10);
+            $table->datetime('date');
+            $table->string('lr_no', 30);
+            $table->string('truck_no', 20);
             $table->string('from_to', 100);
-            $table->string('material_details', 255);
+            $table->string('material_parcel', 255);
             $table->float('total_weight', 8, 2);
             $table->float('freight_amount', 10, 2)->default(0);
             $table->float('halting_charge', 10, 2)->default(0);
@@ -27,6 +33,7 @@ return new class extends Migration
             $table->text('remarks');
             $table->float('sub_total', 10, 2)->default(0);
             $table->float('discount', 10, 2)->default(0);
+            $table->float('total_trip_amount', 10, 2)->default(0);
             $table->float('invoice_value', 10, 2)->default(0);
             $table->float('advance_received', 10, 2)->default(0);
             $table->float('net_payable', 10, 2)->default(0);

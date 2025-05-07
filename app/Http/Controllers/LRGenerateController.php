@@ -170,4 +170,18 @@ class LRGenerateController extends Controller
         $pdf = Pdf::loadView('pdf', ['data' => $data]);
         return $pdf->download("LR_{$invoice_no}.pdf");
     }
+
+    public function getLRDetailsByInvoice($invoice_no)
+    {
+        $lr = LR_Generate::where('invoice_no', $invoice_no)->first();
+
+        if (!$lr) {
+            return response()->json(['error' => 'No LR record found'], 404);
+        }
+
+        return response()->json([
+            'lr_no' => $lr->lorry_no,
+            'sub_total' => $lr->grand_total
+        ]);
+    }
 }
