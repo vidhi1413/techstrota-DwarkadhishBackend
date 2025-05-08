@@ -6,12 +6,17 @@ use App\Models\Invoices;
 use App\Models\LR_Generate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use NumberToWords\NumberToWords;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoicesController extends Controller
-{  
-    public function calculateNetPayable(Request $request)
 {
+    public function index()
+    {
+        return Invoices::all();
+    }
+    public function calculateNetPayable(Request $request)
+    {
         // Validate inputs
         $validator = Validator::make($request->all(), [
             'trip_amount' => 'required|numeric',
@@ -89,7 +94,7 @@ class InvoicesController extends Controller
                 'invoice_value.required' => 'Invoice value is required.',
                 'advance_received.required' => 'Advance received is required.',
             ]);
-            
+            $validatedData['date'] = \Carbon\Carbon::parse($validatedData['date'])->setTimeFromTimeString(now()->format('H:i:s'));
 
             $validatedData['net_payable'] = $validatedData['invoice_value'] - $validatedData['advance_received'];
 
@@ -108,13 +113,22 @@ class InvoicesController extends Controller
         }
     }
 
+    function convertNumberToWords($amount) {
+        $numberToWords = new NumberToWords();
+        // Create the number transformer for English
+        $numberTransformer = $numberToWords->getNumberTransformer('en');
+        return strtoupper($numberTransformer->toWords($amount)) . ' ONLY';
+    }
+
     public function downloadIncoicePDF($invoice_no)
     {
-        $data = LR_Generate::where('invoice_no', $invoice_no)->first();
+        $data = Invoices::where('invoice_no', $invoice_no)->first();
         if (!$data) {
             return response()->json(['error' => 'Invoice not found'], 404);
         }
-        $pdf = Pdf::loadView('pdf', ['data' => $data]);
+        
+        $data->amount_in_words = $this->convertNumberToWords($data->net_payable);
+        $pdf = Pdf::loadView('invoice', ['data' => $data]);
         return $pdf->download("Invoice_{$invoice_no}.pdf");
     }
 }

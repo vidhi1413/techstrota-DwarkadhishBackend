@@ -167,7 +167,7 @@ class LRGenerateController extends Controller
         if (!$data) {
             return response()->json(['error' => 'Invoice not found'], 404);
         }
-        $pdf = Pdf::loadView('pdf', ['data' => $data]);
+        $pdf = Pdf::loadView('lrgenerate', ['data' => $data]);
         return $pdf->download("LR_{$invoice_no}.pdf");
     }
 

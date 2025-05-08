@@ -22,3 +22,7 @@ Route::get('/lr-details/{invoice_no}', [LRGenerateController::class, 'getLRDetai
 Route::post('/calculate-net-payable', [InvoicesController::class, 'calculateNetPayable']);
 
 Route::post('/insert_invoice', [InvoicesController::class, 'store']);
+
+Route::get('/invoices', [InvoicesController::class, 'index']);
+
+Route::get('/invoices/pdf/{invoice_no}', [InvoicesController::class, 'downloadIncoicePDF']);
