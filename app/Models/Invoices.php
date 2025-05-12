@@ -37,4 +37,9 @@ class Invoices extends Model
         'advance_received',
         'net_payable',
     ];
+
+    public function items()
+    {
+        return $this->hasMany(InvoiceItem::class, 'invoice_id');
+    }
 }

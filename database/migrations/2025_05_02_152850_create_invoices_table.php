@@ -19,16 +19,6 @@ return new class extends Migration
             $table->integer('branch');
             $table->string('invoice_no', 10);
             $table->datetime('date');
-            $table->string('lr_no', 30);
-            $table->string('truck_no', 20);
-            $table->string('from_to', 100);
-            $table->string('material_parcel', 255);
-            $table->float('total_weight', 8, 2);
-            $table->float('freight_amount', 10, 2)->default(0);
-            $table->float('halting_charge', 10, 2)->default(0);
-            $table->float('extra_charge', 10, 2)->default(0);
-            $table->float('advance', 10, 2)->default(0);
-            $table->float('trip_amount', 10, 2)->default(0);
             $table->string('hsn_sac', 20);
             $table->text('remarks');
             $table->float('sub_total', 10, 2)->default(0);

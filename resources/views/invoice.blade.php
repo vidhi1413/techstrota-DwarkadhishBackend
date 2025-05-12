@@ -58,7 +58,6 @@
         PAN NO: <span style="color: #666;">ESZPD5938M</span>&nbsp;&nbsp;&nbsp;&nbsp;
         Transport Reg: <span style="color: #666;">9662332719</span>
     </p>
-
     <br>
     <table class="items-table">
         <tr>
@@ -88,18 +87,20 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>{{$data->lr_no}}</td>
-                <td>{{$data->truck_no}}</td>
-                <td>{{$data->from_to}}</td>
-                <td>{{$data->material_parcel}}</td>
-                <td>{{$data->total_weight}}</td>
-                <td>{{$data->freight_amount}}</td>
-                <td>{{$data->halting_charge}}</td>
-                <td>{{$data->extra_charge}}</td>
-                <td>{{$data->advance}}</td>
-                <td>{{$data->trip_amount}}</td>
-            </tr>
+            @foreach ($data->items as $item)
+                <tr>
+                    <td>{{ $item->lr_no }}</td>
+                    <td>{{ $item->truck_no }}</td>
+                    <td>{{ $item->from_to }}</td>
+                    <td>{{ $item->material_parcel }}</td>
+                    <td>{{ $item->total_weight }}</td>
+                    <td>{{ number_format($item->freight_amount, 2) }}</td>
+                    <td>{{ number_format($item->halting_charge, 2) }}</td>
+                    <td>{{ number_format($item->extra_charge, 2) }}</td>
+                    <td>{{ number_format($item->advance, 2) }}</td>
+                    <td>{{ number_format($item->trip_amount, 2) }}</td>
+                </tr>
+            @endforeach
             <tr>
                 <td colspan="5"><strong>HSN / SAC:<strong> {{$data->hsn_sac}}</td>
                 <td colspan="3"><strong>Sub Total:</strong> </td>

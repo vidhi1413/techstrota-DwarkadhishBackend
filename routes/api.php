@@ -25,4 +25,4 @@ Route::post('/insert_invoice', [InvoicesController::class, 'store']);
 
 Route::get('/invoices', [InvoicesController::class, 'index']);
 
-Route::get('/invoices/pdf/{invoice_no}', [InvoicesController::class, 'downloadIncoicePDF']);
+Route::get('/invoices/pdf/{invoice_no}', [InvoicesController::class, 'downloadInvoicePDF']);
