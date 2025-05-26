@@ -31,6 +31,7 @@ return new class extends Migration
             $table->integer('policy_no');
             $table->double('amount_rs', 8, 2);
             $table->double('risk_rs', 8, 2);
+            $table->string('gst_payer');
             $table->string('packages', 30);
             $table->string('destination', 30);
             $table->double('actual_weight', 8, 2);

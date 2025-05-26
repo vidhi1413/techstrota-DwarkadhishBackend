@@ -80,6 +80,7 @@
         <tr>
             <td><strong>From:</strong> {{$data->from}}</td><br>
             <td><strong>To:</strong> {{$data->to}}</td><br>
+            <td><strong>Personal Liable For Paying GSTIN:</strong> {{$data->gst_payer}}</td><br>
         </tr>
     </table>
     <br>

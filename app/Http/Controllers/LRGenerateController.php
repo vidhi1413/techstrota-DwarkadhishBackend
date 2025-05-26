@@ -34,6 +34,7 @@ class LRGenerateController extends Controller
                 'policy_no' => 'required|integer',
                 'amount_rs' => 'required|numeric',
                 'risk_rs' => 'required|numeric',
+                'gst_payer' => 'required|string|max:30',
                 'packages' => 'required|string|max:30',
                 'destination' => 'required|string|max:30',
                 'actual_weight' => 'required|numeric',
@@ -78,6 +79,8 @@ class LRGenerateController extends Controller
                 'amount_rs.numeric' => 'Amount must be a valid number.',
                 'risk_rs.required' => 'Risk amount is required.',
                 'risk_rs.numeric' => 'Risk amount must be a valid number.',
+                'gst_payer.required' => 'GST payer is required.',
+                'gst_payer.max' => 'GST payer must not exceed 30 characters.',
                 'packages.required' => 'Package information is required.',
                 'packages.max' => 'Package information must not exceed 30 characters.',
                 'destination.required' => 'Destination is required.',
@@ -180,8 +183,9 @@ class LRGenerateController extends Controller
         }
 
         return response()->json([
-            'lr_no' => $lr->lorry_no,
-            'sub_total' => $lr->grand_total
+            'truck_no' => $lr->lorry_no,
+            'from_to' => $lr->from . ' - ' . $lr->to,
+            'total_weight' => $lr->actual_weight,
         ]);
     }
 }

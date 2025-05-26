@@ -30,6 +30,7 @@ class LR_Generate extends Model
         'policy_no',
         'amount_rs',
         'risk_rs',
+        'gst_payer',
         'packages',
         'destination',
         'actual_weight',
