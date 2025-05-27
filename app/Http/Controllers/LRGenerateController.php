@@ -163,7 +163,7 @@ class LRGenerateController extends Controller
             'cnn_no' => $cnn_no
         ]);
     }
-
+    
     public function downloadPDF($invoice_no)
     {
         $data = LR_Generate::where('invoice_no', $invoice_no)->first();
