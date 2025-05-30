@@ -17,7 +17,7 @@ Route::get('/next-lr-numbers', [LRGenerateController::class, 'getNextNumbers']);
 
 Route::get('/lr-generate/pdf/{invoice_no}', [LRGenerateController::class, 'downloadPDF']);
 
-Route::get('/lr-details/{invoice_no}', [LRGenerateController::class, 'getLRDetailsByInvoice']);
+Route::get('/lr-details/{lr_generate_no}', [LRGenerateController::class, 'getLRDetailsByInvoice']);
 
 Route::post('/calculate-net-payable', [InvoicesController::class, 'calculateNetPayable']);
 
